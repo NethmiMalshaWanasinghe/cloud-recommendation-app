@@ -1,0 +1,435 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Service Recommender</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --hover-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            margin: 2rem auto;
+            
+            overflow: hidden;
+        }
+        
+        .header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin: -1px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            padding: 2rem;
+            margin: 2rem;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .form-card:hover {
+            box-shadow: var(--hover-shadow);
+            transform: translateY(-2px);
+        }
+        
+        .form-section {
+            margin-bottom: 2rem;
+        }
+        
+        .form-section h4 {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-control, .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .form-check {
+            margin-bottom: 1rem;
+        }
+        
+        .form-check-input {
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            padding: 0.5rem;
+        }
+        
+        .form-check-input:checked {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+        
+        .form-check-label {
+            font-weight: 500;
+            color: #495057;
+            margin-left: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-load-more {
+            background: var(--secondary-gradient);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-load-more:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(240, 147, 251, 0.4);
+        }
+        
+        .results-section {
+            margin: 2rem;
+        }
+        
+        .results-header {
+            background: var(--secondary-gradient);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px 15px 0 0;
+            margin-bottom: 0;
+        }
+        
+        .results-header h2 {
+            margin: 0;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .table-responsive {
+            border-radius: 0 0 15px 15px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .table {
+            margin: 0;
+            background: white;
+        }
+        
+        .table thead th {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            font-weight: 600;
+            border: none;
+            padding: 1rem;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .table tbody tr {
+            transition: all 0.3s ease;
+        }
+        
+        .table tbody tr:hover {
+            background-color: rgba(102, 126, 234, 0.1);
+            transform: scale(1.01);
+        }
+        
+        .table td {
+            padding: 1rem;
+            border-color: #e9ecef;
+            font-weight: 500;
+        }
+        
+        .badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .success-message {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 2rem;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .icon {
+            font-size: 1.2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .form-card {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+            
+            .results-section {
+                margin: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="main-container">
+            <div class="header">
+                <h1><i class="fas fa-cloud icon"></i> Cloud Service Recommender</h1>
+                <p>Find the perfect cloud service for your needs with AI-powered recommendations</p>
+            </div>
+
+            <div class="form-card">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-section">
+                                <h4><i class="fas fa-server icon"></i> Service Configuration</h4>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Cloud Provider</label>
+                                    <select name="provider" class="form-select">
+                                        <option value="">Any Provider</option>
+                                        {% for p in providers %}
+                                        <option value="{{ p }}" {% if p == selected_provider %}selected{% endif %}>{{ p }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Service Type</label>
+                                    <select name="type" class="form-select">
+                                        <option value="">Any Type</option>
+                                        {% for t in types %}
+                                        <option value="{{ t }}" {% if t == selected_type %}selected{% endif %}>{{ t }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-section">
+                                <h4><i class="fas fa-chart-line icon"></i> Performance Requirements</h4>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Minimum CPU Utilization (%)</label>
+                                    <input type="number" name="min_cpu" step="0.1" value="{{ min_cpu }}" class="form-control"/>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Minimum Memory Usage (MB)</label>
+                                    <input type="number" name="min_memory" step="0.1" value="{{ min_memory }}" class="form-control"/>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Minimum Network Bandwidth (Mbps)</label>
+                                    <input type="number" name="min_bandwidth" step="0.1" value="{{ min_bandwidth }}" class="form-control"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4><i class="fas fa-cogs icon"></i> Advanced Options</h4>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="dbscan" id="dbscan" {% if use_dbscan %}checked{% endif %}>
+                                    <label class="form-check-label" for="dbscan">
+                                        Run DBSCAN Clustering
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="lda" id="lda" {% if use_lda %}checked{% endif %}>
+                                    <label class="form-check-label" for="lda">
+                                        Apply LDA Classification
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="optimize" id="optimize" {% if optimize %}checked{% endif %}>
+                                    <label class="form-check-label" for="optimize">
+                                        Optimize by QoS Score
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <label class="form-label">DBSCAN eps</label>
+                                <input type="number" step="0.1" name="eps" value="{{ eps }}" class="form-control"/>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">DBSCAN min_samples</label>
+                                <input type="number" name="min_samples" value="{{ min_samples }}" class="form-control"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Get Recommendations
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            {% if results %}
+            <div class="results-section">
+                <div class="results-header">
+                    <h2><i class="fas fa-trophy icon"></i> Top Recommended Services</h2>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Service ID</th>
+                                <th>Type</th>
+                                <th>Provider</th>
+                                <th>CPU (%)</th>
+                                <th>Memory (MB)</th>
+                                <th>Bandwidth (Mbps)</th>
+                                <th>Latency (ms)</th>
+                                <th>QoS Score</th>
+                                {% if results[0].get('Cluster') is not none %}<th>Cluster</th>{% endif %}
+                                {% if results[0].get('LDA_1D') is not none %}<th>LDA</th>{% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in results %}
+                            <tr>
+                                <td><strong>{{ r.Service_ID }}</strong></td>
+                                <td><span class="badge bg-primary">{{ r.Service_Type }}</span></td>
+                                <td><span class="badge bg-secondary">{{ r.Cloud_Provider }}</span></td>
+                                <td>{{ r["CPU_Utilization (%)"] }}</td>
+                                <td>{{ r["Memory_Usage (MB)"] }}</td>
+                                <td>{{ r["Network_Bandwidth (Mbps)"] }}</td>
+                                <td>{{ r["Service_Latency (ms)"] }}</td>
+                                <td><strong>{{ r.QoS_Score }}</strong></td>
+                                {% if r.get('Cluster') is not none %}<td><span class="badge bg-info">{{ r.Cluster }}</span></td>{% endif %}
+                                {% if r.get('LDA_1D') is not none %}<td>{{ "%.2f"|format(r.LDA_1D) }}</td>{% endif %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+            <div class="results-section">
+                {% if cluster_plot_html %}
+                <h2>Cluster Visualization (PCA1 vs PCA2)</h2>
+                <div>{{ cluster_plot_html | safe }}</div>
+                {% endif %}
+            </div>
+            {% if show_more %}
+            <div class="text-center" style="margin: 2rem;">
+                <form method="POST" class="d-inline">
+                    <input type="hidden" name="action" value="load_more"/>
+                    <input type="hidden" name="show_count" value="{{ show_count }}">
+                    <input type="hidden" name="provider" value="{{ selected_provider }}">
+                    <input type="hidden" name="type" value="{{ selected_type }}">
+                    <input type="hidden" name="min_cpu" value="{{ min_cpu }}">
+                    <input type="hidden" name="min_memory" value="{{ min_memory }}">
+                    <input type="hidden" name="min_bandwidth" value="{{ min_bandwidth }}">
+                    <input type="hidden" name="dbscan" value="{{ 'on' if use_dbscan else '' }}">
+                    <input type="hidden" name="lda" value="{{ 'on' if use_lda else '' }}">
+                    <input type="hidden" name="optimize" value="{{ 'on' if optimize else '' }}">
+                    <input type="hidden" name="eps" value="{{ eps }}">
+                    <input type="hidden" name="min_samples" value="{{ min_samples }}">
+                    <button type="submit" class="btn btn-load-more">
+                        <i class="fas fa-chevron-down"></i> Load More Results
+                    </button>
+                </form>
+
+            </div>
+            {% else %}
+            <div class="success-message">
+                <i class="fas fa-check-circle"></i> All services have been loaded successfully!
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
